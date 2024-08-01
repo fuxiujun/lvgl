@@ -154,7 +154,9 @@ lv_display_t * lv_display_create(int32_t hor_res, int32_t ver_res)
 void lv_display_delete(lv_display_t * disp)
 {
     bool was_default = false;
+    bool was_refr = false;
     if(disp == lv_display_get_default()) was_default = true;
+    if(disp == _lv_refr_get_disp_refreshing()) was_refr = true;
 
     lv_display_send_event(disp, LV_EVENT_DELETE, NULL);
     lv_event_remove_all(&(disp->event_list));
@@ -202,9 +204,7 @@ void lv_display_delete(lv_display_t * disp)
 
     if(was_default) lv_display_set_default(_lv_ll_get_head(disp_ll_p));
 
-    if(disp == _lv_refr_get_disp_refreshing()) {
-        _lv_refr_set_disp_refreshing(lv_display_get_default());
-    }
+    if(was_refr) _lv_refr_set_disp_refreshing(_lv_ll_get_head(disp_ll_p));
 }
 
 void lv_display_set_default(lv_display_t * disp)
